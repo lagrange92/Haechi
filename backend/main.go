@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -20,11 +22,17 @@ type SeoulSpot struct {
 	shortCode int
 	code      string
 	areaName  string
+	latitude  float64
+	longitude float64
 }
 
 type pplChData struct {
 	spot SeoulSpot
 	data string
+}
+
+func truncateToSixDecimalPlaces(f float64) float64 {
+	return math.Round(f*1e6) / 1e6
 }
 
 func main() {
@@ -40,11 +48,26 @@ func main() {
 			fmt.Println("Error converting string to int: ", err)
 		}
 
+		latFloat, err := strconv.ParseFloat(strings.TrimSpace(readSpot[4]), 64)
+		if err != nil {
+			fmt.Println("Error converting string to float: ", err)
+		}
+
+		lngFloat, err := strconv.ParseFloat(strings.TrimSpace(readSpot[5]), 64)
+		if err != nil {
+			fmt.Println("Error converting string to float: ", err)
+		}
+
+		latFloat = truncateToSixDecimalPlaces(latFloat)
+		lngFloat = truncateToSixDecimalPlaces(lngFloat)
+
 		seoulSpots = append(seoulSpots, SeoulSpot{
 			category:  readSpot[0],
 			code:      readSpot[1],
 			shortCode: shortCode,
 			areaName:  readSpot[3],
+			latitude:  latFloat,
+			longitude: lngFloat,
 		})
 	}
 
@@ -58,7 +81,7 @@ func main() {
 	}
 
 	// Activate to check if you want to check that data is valid
-	// savePpl(curPplMap)
+	savePpl(curPplMap)
 
 	// ====================== Echo code snippet ======================
 	// e := echo.New()
@@ -130,7 +153,7 @@ func savePpl(curPplMap map[SeoulSpot]string) {
 
 	num := 1
 	for spot, data := range curPplMap {
-		_, err := fmt.Fprintf(file, "[%d. %s]\n%s\n", num, spot.areaName, data)
+		_, err := fmt.Fprintf(file, "[%d. %s] %f %f\n%s\n", num, spot.areaName, spot.latitude, spot.longitude, data)
 		if err != nil {
 			log.Fatal("Error writing to file: ", err)
 		}
