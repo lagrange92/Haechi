@@ -1,15 +1,18 @@
 <template>
   <div id="app">
-    <div>
-      <p>Welcome to Haechi!!!</p>
-    </div>
+    <p>Welcome to Haechi!!!</p>
+    <NaverMap />
   </div>
 </template>
 
 <script>
+import NaverMap from "./components/NaverMap.vue";
+
 export default {
   name: "App",
-  components: {},
+  components: {
+    NaverMap,
+  },
 };
 </script>
 
