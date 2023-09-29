@@ -15,6 +15,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/cors"
 )
 
 // SeoulSpot struct from "./resources/seoul_spot_113.csv"
@@ -187,6 +188,12 @@ func main() {
 
 	// ====================== Echo code snippet ======================
 	e := echo.New()
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:8080"},
+		AllowCredentials: true,
+	})
+
+	e.Use(echo.WrapMiddleware(c.Handler))
 
 	e.GET("/", handleHome)
 	e.GET("/ppltn", handlePpltn)

@@ -11,6 +11,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/pkoukk/tiktoken-go v0.1.2 // indirect
+	github.com/rs/cors v1.10.0 // indirect
 	github.com/tmc/langchaingo v0.0.0-20230927190705-e3b6d21f5662 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
