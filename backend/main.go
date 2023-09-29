@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -31,14 +32,115 @@ type pplChData struct {
 	data string
 }
 
+var seoulSpots []SeoulSpot
+var curPplMap = make(map[SeoulSpot]string)
+var spotPplCh = make(chan pplChData)
+
 func truncateToSixDecimalPlaces(f float64) float64 {
 	return math.Round(f*1e6) / 1e6
 }
 
+type FcstPpltnJSON struct {
+	FcstTime       string `json:"FCST_TIME"`
+	FcstCongestLvl string `json:"FCST_CONGEST_LVL"`
+	FcstPpltnMin   string `json:"FCST_PPLTN_MIN"`
+	FcstPpltnMax   string `json:"FCST_PPLTN_MAX"`
+}
+
+type PpltnJSON struct {
+	AreaName          string          `json:"AREA_NM"`
+	AreaCode          string          `json:"AREA_CD"`
+	AreaCongestLvl    string          `json:"AREA_CONGEST_LVL"`
+	AreaCongestMsg    string          `json:"AREA_CONGEST_MSG"`
+	AreaPpltnMin      string          `json:"AREA_PPLTN_MIN"`
+	AreaPpltnMax      string          `json:"AREA_PPLTN_MAX"`
+	MalePpltnRate     string          `json:"MALE_PPLTN_RATE"`
+	FemalePpltnRate   string          `json:"FEMALE_PPLTN_RATE"`
+	PpltnRate0        string          `json:"PPLTN_RATE_0"`
+	PpltnRate10       string          `json:"PPLTN_RATE_10"`
+	PpltnRate20       string          `json:"PPLTN_RATE_20"`
+	PpltnRate30       string          `json:"PPLTN_RATE_30"`
+	PpltnRate40       string          `json:"PPLTN_RATE_40"`
+	PpltnRate50       string          `json:"PPLTN_RATE_50"`
+	PpltnRate60       string          `json:"PPLTN_RATE_60"`
+	PpltnRate70       string          `json:"PPLTN_RATE_70"`
+	ResntPpltnRate    string          `json:"RESNT_PPLTN_RATE"`
+	NonResntPpltnRate string          `json:"NON_RESNT_PPLTN_RATE"`
+	ReplaceYn         string          `json:"REPLACE_YN"`
+	PpltnTime         string          `json:"PPLTN_TIME"`
+	FcstYn            string          `json:"FCST_YN"`
+	FcstPpltn         []FcstPpltnJSON `json:"FCST_PPLTN"`
+}
+
+type SeoulCityJSON struct {
+	Ppltn []PpltnJSON `json:"SeoulRtd.citydata_ppltn"`
+}
+
+type PpltnData struct {
+	AreaName      string `json:"areaName"`
+	AreaCode      string `json:"areaCode"`
+	AreaLongitude string `json:"areaLongitude"`
+	AreaLatitude  string `json:"areaLatitude"`
+	AreaAvgPpltn  string `json:"areaAvgPpltn"`
+}
+
+// Handler
+func handlePpltn(c echo.Context) error {
+
+	var recvSeoulCity SeoulCityJSON
+
+	var sendPpltns []PpltnData
+
+	for spot, data := range curPplMap {
+		err := json.Unmarshal([]byte(data), &recvSeoulCity)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		var sendPpltn PpltnData
+		sendPpltn.AreaName = recvSeoulCity.Ppltn[0].AreaName
+		sendPpltn.AreaCode = recvSeoulCity.Ppltn[0].AreaCode
+		sendPpltn.AreaLatitude = fmt.Sprintf("%f", spot.latitude)
+		sendPpltn.AreaLongitude = fmt.Sprintf("%f", spot.longitude)
+
+		ppltnMin, _ := strconv.Atoi(recvSeoulCity.Ppltn[0].AreaPpltnMin)
+		ppltnMax, _ := strconv.Atoi(recvSeoulCity.Ppltn[0].AreaPpltnMax)
+		sendPpltn.AreaAvgPpltn = fmt.Sprintf("%d", (ppltnMin+ppltnMax)/2)
+
+		sendPpltns = append(sendPpltns, sendPpltn)
+	}
+
+	// normalize average population to 0~1
+	normalMin := 987654321
+	normalMax := 0
+
+	for _, sendPpltn := range sendPpltns {
+		avgPpltn, _ := strconv.Atoi(sendPpltn.AreaAvgPpltn)
+		if avgPpltn < normalMin {
+			normalMin = avgPpltn
+		}
+		if avgPpltn > normalMax {
+			normalMax = avgPpltn
+		}
+	}
+
+	for i, sendPpltn := range sendPpltns {
+		avgPpltn, _ := strconv.Atoi(sendPpltn.AreaAvgPpltn)
+		normalPpltn := float64(avgPpltn-normalMin) / float64(normalMax-normalMin)
+		sendPpltns[i].AreaAvgPpltn = fmt.Sprintf("%f", normalPpltn)
+	}
+
+	return c.JSON(http.StatusOK, sendPpltns)
+}
+
+func handleMapData(c echo.Context) error {
+	// return seoulSpots data as json
+	fmt.Println(seoulSpots)
+	return c.JSON(http.StatusOK, seoulSpots)
+}
+
 func main() {
-	var seoulSpots []SeoulSpot
-	curPplMap := make(map[SeoulSpot]string)
-	var spotPplCh = make(chan pplChData)
 
 	readSpots := readSeoulSpots()
 
@@ -81,15 +183,17 @@ func main() {
 	}
 
 	// Activate to check if you want to check that data is valid
-	savePpl(curPplMap)
+	// savePpl(curPplMap)
 
 	// ====================== Echo code snippet ======================
-	// e := echo.New()
+	e := echo.New()
 
-	// e.GET("/", handleHome)
-	// e.Logger.Fatal(e.Start(":1323"))
+	e.GET("/", handleHome)
+	e.GET("/ppltn", handlePpltn)
+	e.Logger.Fatal(e.Start(":1323"))
+	// ===============================================================
 
-	// OpenAI code snippet
+	// =================== OpenAI code snippet =======================
 	// llm, err := openai.New()
 	// if err != nil {
 	// 	log.Fatal(err)
