@@ -12,7 +12,7 @@ func HandleHome(c echo.Context) error {
 	return c.String(http.StatusOK, "Welcome to Haechi Server!")
 }
 
-// HandlePpl : handle request to '/ppltn'
+// HandlePpl : handle request to '/ppl'
 func HandlePpl(c echo.Context) error {
 	return c.JSON(http.StatusOK, store.PplDistribution)
 }
