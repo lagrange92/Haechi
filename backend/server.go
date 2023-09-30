@@ -23,7 +23,7 @@ func CreateServer() Server {
 	e.Use(echo.WrapMiddleware(c.Handler))
 
 	e.GET("/", HandleHome)
-	e.GET("/ppltn", HandlePpltn)
+	e.GET("/ppl", HandlePpl)
 
 	return Server{e}
 }
