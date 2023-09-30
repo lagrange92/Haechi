@@ -8,7 +8,7 @@ import (
 )
 
 // Convert : convert model.SeoulCityJSON to model.PpltnData
-func Convert(from model.SeoulCityJSON) (to model.PpltnData) {
+func Convert(from model.SeoulCityJSON) (to model.PplData) {
 	ppltnMin, _ := strconv.Atoi(from.Ppltn[0].AreaPpltnMin)
 	ppltnMax, _ := strconv.Atoi(from.Ppltn[0].AreaPpltnMax)
 

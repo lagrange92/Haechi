@@ -9,9 +9,3 @@ type SeoulSpot struct {
 	Latitude  float64
 	Longitude float64
 }
-
-// PplChData data for Ppl Channel
-type PplChData struct {
-	Spot SeoulSpot
-	Data string
-}

@@ -7,12 +7,13 @@ import (
 	"net/http"
 
 	"github.com/lagrange92/Haechi/model"
+	"github.com/lagrange92/Haechi/store"
 	"github.com/lagrange92/Haechi/utils"
 )
 
 // GetCurPplData gets current population data from Seoul Open API
-func requestPpl(spot model.SeoulSpot, ch chan<- model.PpltnData) {
-	url := model.SeoulBaseURL + spot.AreaName
+func requestPpl(spot model.SeoulSpot, ch chan<- model.PplData) {
+	url := store.SeoulBaseURL + spot.AreaName
 	body := requestPplOnURL(spot, url)
 
 	ppl := makePpl(body, spot)
@@ -37,12 +38,12 @@ func requestPplOnURL(spot model.SeoulSpot, url string) []byte {
 	return body
 }
 
-func makePpl(body []byte, spot model.SeoulSpot) model.PpltnData {
+func makePpl(body []byte, spot model.SeoulSpot) model.PplData {
 	pplJSON := utils.Unmarshal(body)
 
 	if len(pplJSON.Ppltn) == 0 {
 		fmt.Println("No pplJSON data for ", spot.AreaName)
-		return model.PpltnData{}
+		return model.PplData{}
 	}
 
 	ppl := utils.Convert(pplJSON)

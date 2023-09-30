@@ -10,7 +10,7 @@ import (
 )
 
 // savePpl : save ppl data to file
-func savePpl(ppls []model.PpltnData) {
+func savePpl(ppls []model.PplData) {
 	// 파일 생성 및 열기
 	filename := "./current_people_" + time.Now().Format("060102_1504") + ".txt" // ex) current_people_YYMMDD_HHmm.txt
 	file, err := os.Create(filename)

@@ -8,7 +8,7 @@ import (
 )
 
 // normalizePpl normalizes average population to 0~1
-func normalizePpl(ppls []model.PpltnData) {
+func normalizePpl(ppls []model.PplData) {
 	normalMin := 987654321
 	normalMax := 0
 

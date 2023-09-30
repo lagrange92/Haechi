@@ -6,4 +6,7 @@ import "github.com/lagrange92/Haechi/model"
 var SeoulSpots []model.SeoulSpot
 
 // PplDistribution : Latest population data
-var PplDistribution []model.PpltnData
+var PplDistribution []model.PplData
+
+// SeoulBaseURL : Base URL for Seoul Open API
+var SeoulBaseURL string

@@ -5,9 +5,9 @@ import (
 )
 
 // AggregatePpl aggregates population data from Seoul Open API
-func AggregatePpl(seoulSpots []model.SeoulSpot) []model.PpltnData {
-	ppls := []model.PpltnData{}
-	pplCh := make(chan model.PpltnData)
+func AggregatePpl(seoulSpots []model.SeoulSpot) []model.PplData {
+	ppls := []model.PplData{}
+	pplCh := make(chan model.PplData)
 
 	// Request latest ppl data to Seoul Open API by using goroutines
 	for _, seoulSpot := range seoulSpots {

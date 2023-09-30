@@ -6,7 +6,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/lagrange92/Haechi/bootstrap"
-	"github.com/lagrange92/Haechi/model"
+	"github.com/lagrange92/Haechi/store"
 )
 
 func init() {
@@ -15,7 +15,7 @@ func init() {
 		log.Fatal("Error loading .env file")
 	}
 
-	model.SeoulBaseURL = os.Getenv("SEOUL_OPEN_API_BASE_URL") +
+	store.SeoulBaseURL = os.Getenv("SEOUL_OPEN_API_BASE_URL") +
 		os.Getenv("SEOUL_OPEN_API_KEY") +
 		os.Getenv("SEOUL_OPEN_API_URL_SUFFIX")
 }
