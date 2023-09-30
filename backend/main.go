@@ -15,15 +15,19 @@ func init() {
 		log.Fatal("Error loading .env file")
 	}
 
-	model.SeoulBaseURL = "http://openapi.seoul.go.kr:8088/" + os.Getenv("SEOUL_OPEN_API_KEY") + "/json/citydata_ppltn/1/5/"
+	model.SeoulBaseURL = os.Getenv("SEOUL_OPEN_API_BASE_URL") +
+		os.Getenv("SEOUL_OPEN_API_KEY") +
+		os.Getenv("SEOUL_OPEN_API_URL_SUFFIX")
 }
 
 func main() {
-	bootstrap.Load()
+	bootstrap.Bootstrap()
 
-	CreateServer()
+	go bootstrap.ActivateWorker()
 
-	err := StartServer()
+	server := CreateServer()
+
+	err := StartServer(server)
 	if err != nil {
 		log.Fatal(err)
 	}

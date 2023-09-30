@@ -5,10 +5,13 @@ import (
 	"github.com/rs/cors"
 )
 
-var e echo.Echo
+// Server : echo server
+type Server struct {
+	e *echo.Echo
+}
 
 // CreateServer creates echo server
-func CreateServer() {
+func CreateServer() Server {
 	e := echo.New()
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{
@@ -21,9 +24,11 @@ func CreateServer() {
 
 	e.GET("/", HandleHome)
 	e.GET("/ppltn", HandlePpltn)
+
+	return Server{e}
 }
 
 // StartServer starts echo server
-func StartServer() error {
-	return e.Start(":1323")
+func StartServer(server Server) error {
+	return server.e.Start(":1323")
 }
