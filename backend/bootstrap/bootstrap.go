@@ -17,7 +17,7 @@ func Bootstrap() {
 
 // ActivateWorker : run update ppl worker eternally, should invoke as goroutine
 func ActivateWorker() {
-	time.Sleep(1 * time.Minute) // wait 1 minute for bootstrap finished at first
+	time.Sleep(1 * time.Hour) // test code
 
 	activateUpdatePplWorker()
 }

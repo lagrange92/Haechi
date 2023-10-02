@@ -39,7 +39,7 @@ func requestPplOnURL(spot model.SeoulSpot, url string) []byte {
 }
 
 func makePpl(body []byte, spot model.SeoulSpot) model.PplData {
-	pplJSON := utils.Unmarshal(body)
+	pplJSON := utils.UnmarshalSeoulCity(body)
 
 	if len(pplJSON.Ppltn) == 0 {
 		fmt.Println("No pplJSON data for ", spot.AreaName)

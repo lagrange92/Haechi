@@ -7,11 +7,11 @@ import (
 	"github.com/lagrange92/Haechi/model"
 )
 
-// Unmarshal : unmarshal json to model.SeoulCityJSON
-func Unmarshal(from []byte) (to model.SeoulCityJSON) {
-	errMarshal := json.Unmarshal(from, &to)
-	if errMarshal != nil {
-		fmt.Println(errMarshal)
+// UnmarshalSeoulCity : unmarshal json to model.SeoulCityJSON
+func UnmarshalSeoulCity(from []byte) (to model.SeoulCityJSON) {
+	err := json.Unmarshal(from, &to)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	return
