@@ -16,3 +16,13 @@ type CozyPlacesData struct {
 	AreaLongitude string `json:"areaLongitude"`
 	AreaAvgPpltn  string `json:"areaAvgPpltn"`
 }
+
+// ChatPromptData : User sent prompt data to chatbot
+type ChatPromptData struct {
+	Prompt string `json:"prompt"`
+}
+
+// ChatResponseData : Chatbot response data to user
+type ChatResponseData struct {
+	Response string `json:"response"`
+}

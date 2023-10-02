@@ -25,6 +25,7 @@ func CreateServer() Server {
 	e.GET("/", HandleHome)
 	e.GET("/ppl", HandlePpl)
 	e.GET("/cozy", HandleCozy)
+	e.POST("/chat", HandleChat)
 
 	return Server{e}
 }
