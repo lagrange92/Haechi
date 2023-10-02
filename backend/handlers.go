@@ -16,3 +16,8 @@ func HandleHome(c echo.Context) error {
 func HandlePpl(c echo.Context) error {
 	return c.JSON(http.StatusOK, store.PplDistribution)
 }
+
+// HandleCozy : handle request to '/cozy'
+func HandleCozy(c echo.Context) error {
+	return c.JSON(http.StatusOK, store.CozyPlaces)
+}

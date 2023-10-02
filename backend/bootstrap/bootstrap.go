@@ -5,6 +5,7 @@ import (
 	"time"
 
 	aggreation "github.com/lagrange92/Haechi/aggregation"
+	"github.com/lagrange92/Haechi/cozy"
 	"github.com/lagrange92/Haechi/model"
 	"github.com/lagrange92/Haechi/store"
 )
@@ -12,7 +13,7 @@ import (
 // Bootstrap : load seoul spots data and request latest ppl data
 func Bootstrap() {
 	bootstrapSeoulSpot()
-	bootstrapLatestPpl(store.SeoulSpots)
+	updatePplResource(store.SeoulSpots)
 }
 
 // ActivateWorker : run update ppl worker eternally, should invoke as goroutine
@@ -31,7 +32,7 @@ func activateUpdatePplWorker() {
 		case <-updatePplWorker.C:
 			fmt.Println("Updating ppl data started...")
 
-			bootstrapLatestPpl(store.SeoulSpots)
+			updatePplResource(store.SeoulSpots)
 
 			fmt.Println("Updating ppl data finished.")
 		}
@@ -43,7 +44,14 @@ func bootstrapSeoulSpot() {
 	store.SeoulSpots = seoulSpots
 }
 
-func bootstrapLatestPpl(seoulSpots []model.SeoulSpot) {
+func updatePplResource(seoulSpots []model.SeoulSpot) {
 	latestPpl := aggreation.AggregatePpl(seoulSpots)
 	store.PplDistribution = latestPpl
+
+	cozyPlaces, err := cozy.GetCozyPlaces(latestPpl)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	store.CozyPlaces = cozyPlaces
 }

@@ -24,6 +24,7 @@ func CreateServer() Server {
 
 	e.GET("/", HandleHome)
 	e.GET("/ppl", HandlePpl)
+	e.GET("/cozy", HandleCozy)
 
 	return Server{e}
 }

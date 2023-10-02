@@ -10,3 +10,6 @@ var PplDistribution []model.PplData
 
 // SeoulBaseURL : Base URL for Seoul Open API
 var SeoulBaseURL string
+
+// CozyPlaces : Cozy places in Seoul
+var CozyPlaces []model.CozyPlacesData

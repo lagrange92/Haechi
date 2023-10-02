@@ -1,6 +1,8 @@
 package aggreation
 
 import (
+	"sort"
+
 	"github.com/lagrange92/Haechi/model"
 )
 
@@ -27,6 +29,11 @@ func AggregatePpl(seoulSpots []model.SeoulSpot) []model.PplData {
 	}
 
 	normalizePpl(ppls)
+
+	// sort by area average population
+	sort.Slice(ppls, func(i, j int) bool {
+		return ppls[i].AreaAvgPpltn < ppls[j].AreaAvgPpltn
+	})
 
 	return ppls
 }
