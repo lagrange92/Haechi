@@ -41,7 +41,7 @@ func getLatLng(keyword, apiKey string) (float64, float64, error) {
 		return 0, 0, err
 	}
 
-	kwdResp := utils.UnmarshalKaoKao(body)
+	kwdResp := utils.UnmarshalKaoKwd(body)
 
 	if len(kwdResp.Documents) > 0 {
 		kwd := kwdResp.Documents[0]

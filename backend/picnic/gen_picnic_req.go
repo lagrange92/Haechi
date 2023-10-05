@@ -15,6 +15,7 @@ func ConvertLLMResp(llmResponse string) model.PicnicRequest {
 	}
 
 	lines := strings.Split(llmResponse, "\n")
+
 	for _, line := range lines {
 		tokens := strings.Split(line, "->")
 		if tokens[0] == "start" {

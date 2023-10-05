@@ -1,7 +1,6 @@
 package chat
 
 import (
-	"context"
 	"log"
 	"strconv"
 	"strings"
@@ -31,12 +30,14 @@ func Chat(prompt string) (string, error) {
 		gptCallOptions = options
 	}
 
-	reqPrompt := genReqPrompt(prompt)
+	// reqPrompt := genReqPrompt(prompt)
 
-	llmResponse, err := gptLLM.Call(context.Background(), reqPrompt, gptCallOptions...)
-	if err != nil {
-		return "", err
-	}
+	// llmResponse, err := gptLLM.Call(context.Background(), reqPrompt, gptCallOptions...)
+	// if err != nil {
+	// 	return "", err
+	// }
+
+	llmResponse := "start->어린이대공원역\nlayovers->신사역, 신논현역\ngoal->신림역\nppl->0.5\n"
 
 	picnicReq := picnic.ConvertLLMResp(llmResponse)
 

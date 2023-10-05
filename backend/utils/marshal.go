@@ -17,8 +17,18 @@ func UnmarshalSeoulCity(from []byte) (to model.SeoulCityJSON) {
 	return
 }
 
-// UnmarshalKaoKao : unmarshal json to model.KaoKwdResponse
-func UnmarshalKaoKao(from []byte) (to model.KaoKwdResponse) {
+// UnmarshalKaoKwd : unmarshal json to model.KaoKwdResponse
+func UnmarshalKaoKwd(from []byte) (to model.KaoKwdResponse) {
+	err := json.Unmarshal(from, &to)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return
+}
+
+// UnmarshalNVDir : unmarshal json to model.NVDirResponse
+func UnmarshalNVDir(from []byte) (to model.NVDirResponse) {
 	err := json.Unmarshal(from, &to)
 	if err != nil {
 		fmt.Println(err)
