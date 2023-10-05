@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -42,6 +43,8 @@ func HandleChat(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(resp)
 
 	return c.JSON(http.StatusOK, resp)
 }

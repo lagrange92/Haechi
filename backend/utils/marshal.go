@@ -16,3 +16,13 @@ func UnmarshalSeoulCity(from []byte) (to model.SeoulCityJSON) {
 
 	return
 }
+
+// UnmarshalKaoKao : unmarshal json to model.KaoKwdResponse
+func UnmarshalKaoKao(from []byte) (to model.KaoKwdResponse) {
+	err := json.Unmarshal(from, &to)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return
+}
