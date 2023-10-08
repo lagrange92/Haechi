@@ -24,5 +24,6 @@ type ChatPromptData struct {
 
 // ChatResponseData : Chatbot response data to user
 type ChatResponseData struct {
-	Response string `json:"response"`
+	Chat    string `json:"chat"`
+	Suggest string `json:"suggest"`
 }

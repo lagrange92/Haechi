@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"context"
 	"log"
 	"strconv"
 	"strings"
@@ -15,7 +16,7 @@ var gptLLM *openai.LLM
 var gptCallOptions []llms.CallOption
 
 // Chat : chat with OpenAI ChatGPT
-func Chat(prompt string) (string, error) {
+func Chat(prompt string) (model.ChatResponseData, error) {
 	if gptLLM == nil {
 		llm, err := openai.New()
 		if err != nil {
@@ -30,61 +31,73 @@ func Chat(prompt string) (string, error) {
 		gptCallOptions = options
 	}
 
-	// reqPrompt := genReqPrompt(prompt)
+	reqPrompt := genReqPrompt(prompt)
 
-	// llmResponse, err := gptLLM.Call(context.Background(), reqPrompt, gptCallOptions...)
-	// if err != nil {
-	// 	return "", err
-	// }
+	llmResponse, err := gptLLM.Call(context.Background(), reqPrompt, gptCallOptions...)
+	if err != nil {
+		return model.ChatResponseData{}, err
+	}
 
-	llmResponse := "start->어린이대공원역\nlayovers->신사역, 신논현역\ngoal->신림역\nppl->0.5\n"
+	// llmResponse := "start->어린이대공원역\nlayovers->신사역, 신논현역\ngoal->신림역\nppl->0.5\n"
 
 	picnicReq := picnic.ConvertLLMResp(llmResponse)
 
 	picnicPlan, _ := picnic.MakePlan(picnicReq)
 
-	picnicPlanStr := genPicnicPlanStr(picnicPlan)
+	picnicPlanResp := genPicnicPlanResp(picnicPlan)
 
-	return picnicPlanStr, nil
+	return picnicPlanResp, nil
 }
 
-func genPicnicPlanStr(plan model.PicnicResponse) string {
-	picnicPlanStr := strings.Builder{}
-	picnicPlanStr.WriteString("출발지는 ")
-	picnicPlanStr.WriteString(plan.Start.Name)
-	picnicPlanStr.WriteString("(")
-	picnicPlanStr.WriteString(strconv.FormatFloat(plan.Start.Latitude, 'f', 6, 64))
-	picnicPlanStr.WriteString(", ")
-	picnicPlanStr.WriteString(strconv.FormatFloat(plan.Start.Longitude, 'f', 6, 64))
-	picnicPlanStr.WriteString(")")
-	picnicPlanStr.WriteString(", ")
+func genPicnicPlanResp(plan model.PicnicResponse) model.ChatResponseData {
+	chatData := strings.Builder{}
+	chatData.WriteString("출발지는 ")
+	chatData.WriteString(plan.Start.Name)
+	// chatData.WriteString("(")
+	// chatData.WriteString(strconv.FormatFloat(plan.Start.Latitude, 'f', 6, 64))
+	// chatData.WriteString(", ")
+	// chatData.WriteString(strconv.FormatFloat(plan.Start.Longitude, 'f', 6, 64))
+	// chatData.WriteString(")")
+	chatData.WriteString(", ")
 
 	if len(plan.LayOvers) > 0 {
-		picnicPlanStr.WriteString("경유지는 ")
+		chatData.WriteString("경유지는 ")
 		first := true
 		for _, layOver := range plan.LayOvers {
 			if first == false {
-				picnicPlanStr.WriteString(", ")
+				chatData.WriteString(", ")
 			}
-			picnicPlanStr.WriteString(layOver.Name)
-			picnicPlanStr.WriteString("(")
-			picnicPlanStr.WriteString(strconv.FormatFloat(layOver.Latitude, 'f', 6, 64))
-			picnicPlanStr.WriteString(", ")
-			picnicPlanStr.WriteString(strconv.FormatFloat(layOver.Longitude, 'f', 6, 64))
-			picnicPlanStr.WriteString(")")
+			chatData.WriteString(layOver.Name)
+			// chatData.WriteString("(")
+			// chatData.WriteString(strconv.FormatFloat(layOver.Latitude, 'f', 6, 64))
+			// chatData.WriteString(", ")
+			// chatData.WriteString(strconv.FormatFloat(layOver.Longitude, 'f', 6, 64))
+			// chatData.WriteString(")")
 
 			first = false
 		}
-		picnicPlanStr.WriteString("이고, ")
+		chatData.WriteString("이고, ")
 	}
-	picnicPlanStr.WriteString("목적지는 ")
-	picnicPlanStr.WriteString(plan.Goal.Name)
-	picnicPlanStr.WriteString("(")
-	picnicPlanStr.WriteString(strconv.FormatFloat(plan.Goal.Latitude, 'f', 6, 64))
-	picnicPlanStr.WriteString(", ")
-	picnicPlanStr.WriteString(strconv.FormatFloat(plan.Goal.Longitude, 'f', 6, 64))
-	picnicPlanStr.WriteString(")")
-	picnicPlanStr.WriteString("입니다.")
+	chatData.WriteString("목적지는 ")
+	chatData.WriteString(plan.Goal.Name)
+	// chatData.WriteString("(")
+	// chatData.WriteString(strconv.FormatFloat(plan.Goal.Latitude, 'f', 6, 64))
+	// chatData.WriteString(", ")
+	// chatData.WriteString(strconv.FormatFloat(plan.Goal.Longitude, 'f', 6, 64))
+	// chatData.WriteString(")")
+	chatData.WriteString("입니다.")
 
-	return picnicPlanStr.String()
+	suggestData := strings.Builder{}
+	suggestData.WriteString("[{\"name\": \"" + plan.Start.Name + "\", \"lat\": " + strconv.FormatFloat(plan.Start.Latitude, 'f', 6, 64) + ", \"lng\": " + strconv.FormatFloat(plan.Start.Longitude, 'f', 6, 64) + "}, ")
+	for _, sugSpot := range plan.LayOvers {
+		suggestData.WriteString("{\"name\": \"" + sugSpot.Name + "\", \"lat\": " + strconv.FormatFloat(sugSpot.Latitude, 'f', 6, 64) + ", \"lng\": " + strconv.FormatFloat(sugSpot.Longitude, 'f', 6, 64) + "}, ")
+	}
+	suggestData.WriteString("{\"name\": \"" + plan.Goal.Name + "\", \"lat\": " + strconv.FormatFloat(plan.Goal.Latitude, 'f', 6, 64) + ", \"lng\": " + strconv.FormatFloat(plan.Goal.Longitude, 'f', 6, 64) + "}]")
+
+	var resp model.ChatResponseData
+
+	resp.Chat = chatData.String()
+	resp.Suggest = suggestData.String()
+
+	return resp
 }
